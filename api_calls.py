@@ -13,7 +13,7 @@ bedrock_agent_runtime = boto3.client(
 )
 
 # Your Knowledge Base ID
-KNOWLEDGE_BASE_ID = os.getenv("EXCHANGE_API_KEY")  # paste your KB ID here
+KNOWLEDGE_BASE_ID = os.getenv("KNOWLEDGE_BASE_ID")  # paste your KB ID here
 
 # Model to use for RAG responses
 RAG_MODEL_ARN = "arn:aws:bedrock:us-east-2:126606499815:inference-profile/us.anthropic.claude-haiku-4-5-20251001-v1:0"
