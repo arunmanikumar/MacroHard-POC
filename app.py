@@ -6,6 +6,30 @@ from agent import run_agent
 import streamlit as st
 import os
 
+def check_password():
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+
+    if not st.session_state.authenticated:
+        st.title("Macrohard Travel Agent")
+        st.markdown("---")
+        password = st.text_input(
+            "Enter demo password:",
+            type="password",
+            placeholder="Enter password to access"
+        )
+        if st.button("Login"):
+            if password == os.getenv("APP_ID_TEST"):
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("Incorrect password. Please try again.")
+        st.stop()
+
+check_password()
+
+# rest of your app code below this line
+
 # Load secrets for cloud deployment
 if hasattr(st, 'secrets'):
     for key, value in st.secrets.items():
