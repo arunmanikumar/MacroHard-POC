@@ -116,7 +116,7 @@ COUNTRY_DATA = {
 HOTEL_DATA = {
     "chennai": [
         {"name": "Courtyard by Marriott Chennai",
-         "price_per_night_usd": 165, "rating": 4.2},
+         "price_per_night_usd": 150, "rating": 4.2},
         {"name": "Holiday Inn Chennai",
          "price_per_night_usd": 210, "rating": 4.0},
         {"name": "Taj Coromandel",
