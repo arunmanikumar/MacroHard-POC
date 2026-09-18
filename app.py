@@ -2,7 +2,7 @@
 import streamlit as st
 import sys
 import json
-from agent import run_agent
+from agents import run_multi_agent as run_agent
 import streamlit as st
 import os
 

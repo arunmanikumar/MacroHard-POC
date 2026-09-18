@@ -505,7 +505,7 @@ def find_hotels(city, check_in_date, nights):
         }
 
 # ─────────────────────────────────────────
-# FUNCTION 6 - POLICY CHECK (Rule-based now, RAG on Day 2)
+# FUNCTION 6 - POLICY CHECK (RAG via Bedrock)
 # ─────────────────────────────────────────
 
 # Policy caps - these will come from RAG document on Day 2
