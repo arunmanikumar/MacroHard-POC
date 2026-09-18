@@ -145,8 +145,11 @@ STEP 3 — EXECUTION SEQUENCE
 ════════════════════════════════════════
 Execute these steps in this exact order every time:
 
-1.  If budget currency is not USD:
-    Call convert_currency FIRST before any other tool
+1.  Check the budget currency first:
+    If budget is already in USD skip convert_currency entirely
+    Only call convert_currency if currency is NOT USD
+    Examples that need conversion: INR, GBP, EUR, JPY, AUD
+    Examples that do NOT need conversion: USD, dollars, $
     Use the converted USD amount for all subsequent calculations
 
 2.  Call get_country_info

@@ -98,9 +98,14 @@ TOOLS = [
     {
         "name": "convert_currency",
         "description": (
-            "Convert trip budget from USD to destination country currency. "
-            "Only call this if the destination currency is not USD. "
-            "If this fails the trip plan cannot proceed."
+            "Convert an amount from one currency to another. "
+            "ONLY call this tool when the from_currency and "
+            "to_currency are DIFFERENT. "
+            "If budget is already in USD do NOT call this tool. "
+            "If destination currency equals source currency "
+            "do NOT call this tool. "
+            "Only call when conversion is actually needed: "
+            "INR to USD, GBP to USD, EUR to USD etc."
         ),
         "input_schema": {
             "type": "object",
