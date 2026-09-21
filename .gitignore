@@ -1,44 +1,74 @@
-venv/
-.streamlit/secrets.toml
-.env
-agent_run_20260918_140517.log
-agent_run_20260918_140703.log
-agent_run_20260918_141053.log
-agent_run_20260918_142335.log
-agent_run_20260918_142630.log
-agent_run_20260918_144341.log
-agent_run_20260918_144513.log
-__pycache__/api_calls.cpython-314.pyc
-__pycache__/agents.cpython-314.pyc
-__pycache__/api_calls.cpython-314.pyc
+# ─────────────────────────────────────────────────────────────
+# .gitignore for Macrohard Travel Agent POC
+# ─────────────────────────────────────────────────────────────
 
-# ===== Python cache & bytecode =====
-# Byte-compiled / optimized / DLL files
+# ── Virtual environments ──────────────────────────────────────
+venv/
+venv312/
+.venv/
+env/
+ENV/
+
+# ── Secrets and credentials ───────────────────────────────────
+# NEVER commit these
+.env
+.env.local
+.env.production
+*.env
+.streamlit/secrets.toml
+
+# ── Python cache ──────────────────────────────────────────────
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
 *$py.class
+*.pyc
+*.pyo
+.Python
 
-# Distribution / packaging
-*.egg-info/
+# ── Build artifacts ───────────────────────────────────────────
+lambda_build/
+travel-agent-lambda.zip
+*.zip
 dist/
 build/
 
-# ===== CloudWatch / awslogs logs =====
-# Common filenames produced by CloudWatch/agents
-awslogs.log
-cloudwatch.log
-cloudwatch-*.log
-awslogs-*.log
+# ── AWS and deployment ────────────────────────────────────────
+lambda-trust-policy.json
+response.json
+samconfig.toml
+.aws-sam/
 
-# Generic logs folder patterns (adjust if your repo uses different paths)
-logs/cloudwatch-*.log
-logs/awslogs/*
-
-# If you store logs at top-level `logs/`
-logs/*.log
-
-# ===== Global log files =====
-# Ignore all .log files (broad; may hide logs you intend to keep)
+# ── Logs ─────────────────────────────────────────────────────
 *.log
+agent_run_*.log
+logs/
+
+# ── IDE and OS files ──────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── Test and temp files ───────────────────────────────────────
+*.tmp
+temp/
+tmp/
+
+# ── Jupyter notebooks (if any) ────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Coverage and testing ──────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Additional ignores ────────────────────────────────────────
+.venv/
+.venv-1/
+venv/
+agent_run_*.log
+test_api_calls.py
+.devcontainer/
