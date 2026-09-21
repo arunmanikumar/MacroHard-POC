@@ -49,13 +49,16 @@ def log_event(agent: str, event: str, data: dict = None):
 # temperature=0 → deterministic responses
 # Critical for policy checks — you want consistent PASS/FAIL
 # not creative variation each run
+import os
+
+# LLM — no guardrails for POC demo
+# Guardrails will be added in production phase
 llm = ChatBedrockConverse(
     model="us.anthropic.claude-haiku-4-5-20251001-v1:0",
     region_name="us-east-2",
     max_tokens=4096,
     temperature=0
 )
-
 print("Part 1 loaded — LLM ready")
 
 # graph.py — PART 2 of 6
@@ -685,6 +688,147 @@ def detect_international(user_input: str) -> bool:
         return False
     return True
 
+# ─────────────────────────────────────────────────────────────
+# INPUT GUARD — runs before any Bedrock call
+# Zero cost check — pure Python, no AWS calls
+# ─────────────────────────────────────────────────────────────
+
+INJECTION_PATTERNS = [
+    "ignore all previous",
+    "ignore previous instructions",
+    "reveal your system prompt",
+    "reveal api keys",
+    "show me your instructions",
+    "disregard your",
+    "forget your instructions",
+    "you are now",
+    "pretend you are",
+    "jailbreak",
+    "dan mode",
+    "developer mode",
+    "override instructions",
+    "bypass your",
+    "system prompt:",
+]
+
+# Minimum fields needed for a valid first-turn request
+REQUIRED_TRAVEL_KEYWORDS = {
+    "destination": [
+        "to ", "chennai", "tokyo", "london", "paris",
+        "new york", "chicago", "los angeles", "india",
+        "japan", "uk", "france", "australia", "mexico",
+        "lax", "ord", "jfk", "lhr", "maa"
+    ],
+    "time": [
+        "january", "february", "march", "april", "may",
+        "june", "july", "august", "september", "october",
+        "november", "december", "2026", "2027",
+        "next week", "next month", "days", "nights"
+    ],
+    "intent": [
+        "book", "plan", "trip", "travel", "flight",
+        "hotel", "fly", "visit", "business", "leisure"
+    ]
+}
+
+
+def check_input(
+    user_input: str,
+    conversation_history: list
+) -> dict:
+    """
+    Validate input before running the agent graph.
+
+    Returns dict with:
+        blocked: True if input should be rejected
+        reason:  Why it was blocked
+        message: User-friendly message to show
+    """
+    input_lower = user_input.lower().strip()
+
+    # ── Check 1: Prompt injection ─────────────────────────────
+    # Block immediately — no agents run, no cost
+    for pattern in INJECTION_PATTERNS:
+        if pattern in input_lower:
+            return {
+                "blocked": True,
+                "reason": "prompt_injection",
+                "message": (
+                    "⚠️ I am Macrohard's corporate travel planning assistant.\n\n"
+                    "I can only help with:\n"
+                    "- Booking flights and hotels\n"
+                    "- Checking travel policy compliance\n"
+                    "- Planning business or leisure trips\n\n"
+                    "Please describe your travel request and I will get started."
+                )
+            }
+
+    # ── Check 2: Too short to be valid ───────────────────────
+    if len(input_lower.split()) < 4:
+        # Skip this check if refining a previous trip
+        if not conversation_history:
+            return {
+                "blocked": True,
+                "reason": "too_short",
+                "message": (
+                    "I need a bit more detail to plan your trip.\n\n"
+                    "Please include:\n"
+                    "- **Where** you are traveling to\n"
+                    "- **When** you want to travel\n"
+                    "- **How many** travelers\n"
+                    "- **Budget** in USD\n\n"
+                    "Example: *Book a business trip for 2 people "
+                    "from Chicago to Chennai on November 15 2026 "
+                    "for 5 days with budget $6000*"
+                )
+            }
+
+    # ── Check 3: Missing fields on first turn ────────────────
+    # Only check on fresh requests — not refinements
+    # If user has conversation history they are refining
+    if not conversation_history:
+        missing = []
+
+        has_destination = any(
+            kw in input_lower
+            for kw in REQUIRED_TRAVEL_KEYWORDS["destination"]
+        )
+        has_time = any(
+            kw in input_lower
+            for kw in REQUIRED_TRAVEL_KEYWORDS["time"]
+        )
+        has_intent = any(
+            kw in input_lower
+            for kw in REQUIRED_TRAVEL_KEYWORDS["intent"]
+        )
+
+        if not has_destination:
+            missing.append("**Destination** — where are you traveling to?")
+        if not has_time:
+            missing.append("**Dates** — when do you want to travel?")
+        if not has_intent:
+            missing.append("**Purpose** — business or leisure trip?")
+
+        if missing:
+            missing_text = "\n".join(f"- {m}" for m in missing)
+            return {
+                "blocked": True,
+                "reason": "missing_fields",
+                "message": (
+                    f"I need a few more details to plan your trip:\n\n"
+                    f"{missing_text}\n\n"
+                    f"**Example:** *Book a business trip for 2 people "
+                    f"from Chicago to Chennai on November 15 2026 "
+                    f"for 5 days with budget $6000*"
+                )
+            }
+
+    # ── All checks passed ────────────────────────────────────
+    return {
+        "blocked": False,
+        "reason": None,
+        "message": None
+    }
 
 print("Part 4 loaded — routing ready")
 
@@ -811,6 +955,35 @@ def run_graph(
         steps:             Node count completed
         validation_passed: Whether validation approved the plan
     """
+
+    # ── INPUT GUARD ───────────────────────────────────────────
+    # Runs BEFORE any Bedrock call
+    # Zero cost — pure Python, no AWS calls
+    # Catches security attacks and missing fields instantly
+    # Saves 20-30 seconds and ~$0.004 per blocked request
+    guard_result = check_input(
+        user_input,
+        conversation_history or []
+    )
+
+    if guard_result["blocked"]:
+        log_event("InputGuard", "blocked", {
+            "reason": guard_result["reason"],
+            "input": user_input[:50]
+        })
+        return {
+            "status": "success",
+            "result": guard_result["message"],
+            "tool_log": [],
+            "steps": 0,
+            "validation_passed": True,
+            "validation_notes": (
+                f"Blocked by input guard: {guard_result['reason']}"
+            )
+        }
+
+    # ── Passed guard — run the graph ──────────────────────────
+
     is_international = detect_international(user_input)
 
     # Build clean starting state from state.py factory function
