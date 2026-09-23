@@ -1,0 +1,71 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Flight Search API",
+    "version": "1.0.0",
+    "description": "Search for flights between cities"
+  },
+  "paths": {
+    "/flights": {
+      "post": {
+        "summary": "Search flights",
+        "description": "Search for available flights between two cities",
+        "operationId": "SearchFlights",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["origin_city", "destination_city", "departure_date"],
+                "properties": {
+                  "origin_city": {
+                    "type": "string",
+                    "description": "Departure city e.g. Chicago"
+                  },
+                  "destination_city": {
+                    "type": "string",
+                    "description": "Arrival city e.g. Chennai, London"
+                  },
+                  "departure_date": {
+                    "type": "string",
+                    "description": "Departure date e.g. 2024-10-15"
+                  },
+                  "passengers": {
+                    "type": "integer",
+                    "description": "Number of passengers",
+                    "default": 1
+                  },
+                  "trip_type": {
+                    "type": "string",
+                    "description": "one-way or round-trip",
+                    "default": "one-way"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Available flights with pricing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string"},
+                    "origin": {"type": "string"},
+                    "destination": {"type": "string"},
+                    "flights": {"type": "array"},
+                    "cheapest_usd": {"type": "number"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

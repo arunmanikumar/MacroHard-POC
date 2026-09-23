@@ -1,0 +1,60 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Hotel Search API",
+    "version": "1.0.0",
+    "description": "Find hotels in a city"
+  },
+  "paths": {
+    "/hotels": {
+      "post": {
+        "summary": "Find hotels",
+        "description": "Find available hotels in a city for given number of nights",
+        "operationId": "FindHotels",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["city", "check_in_date", "nights"],
+                "properties": {
+                  "city": {
+                    "type": "string",
+                    "description": "City name e.g. Chennai, London, New York"
+                  },
+                  "check_in_date": {
+                    "type": "string",
+                    "description": "Check-in date e.g. 2024-10-15"
+                  },
+                  "nights": {
+                    "type": "integer",
+                    "description": "Number of nights to stay"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Available hotels with nightly pricing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string"},
+                    "city": {"type": "string"},
+                    "hotels": {"type": "array"},
+                    "cheapest_per_night": {"type": "number"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

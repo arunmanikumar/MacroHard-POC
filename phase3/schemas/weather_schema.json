@@ -1,0 +1,62 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Weather API",
+    "version": "1.0.0",
+    "description": "Get weather forecast for a city"
+  },
+  "paths": {
+    "/weather": {
+      "post": {
+        "summary": "Get weather forecast",
+        "description": "Get weather forecast for a city on a travel date",
+        "operationId": "GetWeather",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["city", "country_code", "travel_date"],
+                "properties": {
+                  "city": {
+                    "type": "string",
+                    "description": "City name e.g. Chicago, London"
+                  },
+                  "country_code": {
+                    "type": "string",
+                    "description": "2-letter country code e.g. US, IN, GB"
+                  },
+                  "travel_date": {
+                    "type": "string",
+                    "description": "Travel date e.g. 2024-10-15"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Weather forecast with packing advice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string"},
+                    "city": {"type": "string"},
+                    "min_temp_celsius": {"type": "number"},
+                    "max_temp_celsius": {"type": "number"},
+                    "conditions": {"type": "string"},
+                    "packing_advice": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Currency Conversion API",
+    "version": "1.0.0",
+    "description": "Convert amounts between currencies"
+  },
+  "paths": {
+    "/currency": {
+      "post": {
+        "summary": "Convert currency",
+        "description": "Convert an amount from one currency to another using live rates",
+        "operationId": "ConvertCurrency",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["amount", "from_currency", "to_currency"],
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "description": "Amount to convert e.g. 1000"
+                  },
+                  "from_currency": {
+                    "type": "string",
+                    "description": "Source currency code e.g. USD"
+                  },
+                  "to_currency": {
+                    "type": "string",
+                    "description": "Target currency code e.g. INR, GBP, EUR"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Converted amount with exchange rate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string"},
+                    "original_amount": {"type": "number"},
+                    "converted_amount": {"type": "number"},
+                    "exchange_rate": {"type": "number"},
+                    "from_currency": {"type": "string"},
+                    "to_currency": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

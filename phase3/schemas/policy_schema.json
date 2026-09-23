@@ -1,0 +1,67 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Travel Policy API",
+    "version": "1.0.0",
+    "description": "Check Macrohard travel policy compliance via RAG"
+  },
+  "paths": {
+    "/policy": {
+      "post": {
+        "summary": "Check travel policy",
+        "description": "Check if a flight, hotel or total trip cost complies with Macrohard travel policy HR-TRAV-001 v4.1",
+        "operationId": "CheckTravelPolicy",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["item_type", "amount_usd", "city"],
+                "properties": {
+                  "item_type": {
+                    "type": "string",
+                    "description": "Type of cost to check: hotel, flight, or total_trip"
+                  },
+                  "amount_usd": {
+                    "type": "number",
+                    "description": "Cost in USD to validate against policy"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "City where the cost applies"
+                  },
+                  "is_international": {
+                    "type": "boolean",
+                    "description": "True if this is an international trip"
+                  },
+                  "details": {
+                    "type": "string",
+                    "description": "Additional context for the policy check"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Policy check result with PASS or FAIL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string"},
+                    "policy_guidance": {"type": "string"},
+                    "policy_source": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

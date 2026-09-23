@@ -1,0 +1,58 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Country Info API",
+    "version": "1.0.0",
+    "description": "Get country details for travel"
+  },
+  "paths": {
+    "/country": {
+      "post": {
+        "summary": "Get country info",
+        "description": "Get country details including currency, language, timezone and visa requirements",
+        "operationId": "GetCountryInfo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["country_name"],
+                "properties": {
+                  "country_name": {
+                    "type": "string",
+                    "description": "Country name e.g. India, Japan, United Kingdom"
+                  },
+                  "is_international": {
+                    "type": "boolean",
+                    "description": "True if this is an international trip"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Country information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {"type": "string"},
+                    "country": {"type": "string"},
+                    "currency": {"type": "string"},
+                    "language": {"type": "string"},
+                    "timezone": {"type": "string"},
+                    "visa_required": {"type": "boolean"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
